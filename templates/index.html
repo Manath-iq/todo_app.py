@@ -27,11 +27,11 @@
       <ul>
         {% for t in tasks %}
           <li>
-            <form method="post" action="/toggle/{{ loop.index0 }}" style="display:inline">
+            <form method="post" action="{{ url_for('toggle', task_id=t.id) }}" style="display:inline">
               <button title="Отметить выполненной/не выполненной">✓</button>
             </form>
             <span class="{{ 'done' if t.done }}">{{ t.title }}</span>
-            <form method="post" action="/delete/{{ loop.index0 }}" style="display:inline;margin-left:auto">
+            <form method="post" action="{{ url_for('delete', task_id=t.id) }}" style="display:inline;margin-left:auto">
               <button title="Удалить">✕</button>
             </form>
           </li>
