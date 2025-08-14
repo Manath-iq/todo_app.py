@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="utf-8" />
+    <title>ToDo</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <style>
+      body { max-width: 700px; margin: 2rem auto; font-family: system-ui, sans-serif; }
+      h1 { margin-bottom: .5rem; }
+      form { display: flex; gap: .5rem; margin: 1rem 0; }
+      input[type="text"] { flex: 1; padding: .5rem; }
+      button { padding: .5rem 1rem; cursor: pointer; }
+      ul { padding-left: 1.2rem; }
+      li { display: flex; align-items: center; gap: .5rem; margin: .3rem 0; }
+      .done { text-decoration: line-through; opacity: .7; }
+    </style>
+  </head>
+  <body>
+    <h1>Мои задачи</h1>
+
+    <form method="post">
+      <input name="title" type="text" placeholder="Новая задача..." required />
+      <button type="submit">Добавить</button>
+    </form>
+
+    {% if tasks %}
+      <ul>
+        {% for t in tasks %}
+          <li>
+            <form method="post" action="/toggle/{{ loop.index0 }}" style="display:inline">
+              <button title="Отметить выполненной/не выполненной">✓</button>
+            </form>
+            <span class="{{ 'done' if t.done }}">{{ t.title }}</span>
+            <form method="post" action="/delete/{{ loop.index0 }}" style="display:inline;margin-left:auto">
+              <button title="Удалить">✕</button>
+            </form>
+          </li>
+        {% endfor %}
+      </ul>
+    {% else %}
+      <p>Пока задач нет — добавь первую выше 👆</p>
+    {% endif %}
+  </body>
+</html>
