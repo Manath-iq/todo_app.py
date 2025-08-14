@@ -10,6 +10,7 @@
       form { display: flex; gap: .5rem; margin: 1rem 0; }
       input[type="text"] { flex: 1; padding: .5rem; }
       button { padding: .5rem 1rem; cursor: pointer; }
+      .row { display: flex; gap: .75rem; align-items: center; flex-wrap: wrap; }
       .tabs { display: flex; gap: .5rem; margin: .5rem 0 1rem; }
       .tab { padding: .35rem .7rem; border: 1px solid #ccc; border-radius: .4rem; text-decoration: none; color: inherit; }
       .tab.active { background: #eee; font-weight: 600; }
@@ -17,20 +18,29 @@
       li { display: flex; align-items: center; gap: .5rem; margin: .3rem 0; }
       .done { text-decoration: line-through; opacity: .7; }
       .muted { opacity: .7; font-size: .9rem; }
+      .grow { flex: 1; }
     </style>
   </head>
   <body>
     <h1>Мои задачи</h1>
 
-    <form method="post">
-      <input name="title" type="text" placeholder="Новая задача..." required />
-      <button type="submit">Добавить</button>
-    </form>
+    <div class="row">
+      <form method="post" class="grow">
+        <input name="title" type="text" placeholder="Новая задача..." required />
+        <button type="submit">Добавить</button>
+      </form>
+
+      <form method="get">
+        <input type="hidden" name="filter" value="{{ flt }}">
+        <input name="q" type="text" value="{{ qtext }}" placeholder="Поиск по названию" />
+        <button type="submit">Найти</button>
+      </form>
+    </div>
 
     <div class="tabs">
-      <a class="tab {{ 'active' if flt == 'all' }}" href="{{ url_for('index', filter='all') }}">Все ({{ totals.all }})</a>
-      <a class="tab {{ 'active' if flt == 'active' }}" href="{{ url_for('index', filter='active') }}">Активные ({{ totals.active }})</a>
-      <a class="tab {{ 'active' if flt == 'done' }}" href="{{ url_for('index', filter='done') }}">Выполненные ({{ totals.done }})</a>
+      <a class="tab {{ 'active' if flt == 'all' }}" href="{{ url_for('index', filter='all', q=qtext) }}">Все ({{ totals.all }})</a>
+      <a class="tab {{ 'active' if flt == 'active' }}" href="{{ url_for('index', filter='active', q=qtext) }}">Активные ({{ totals.active }})</a>
+      <a class="tab {{ 'active' if flt == 'done' }}" href="{{ url_for('index', filter='done', q=qtext) }}">Выполненные ({{ totals.done }})</a>
     </div>
 
     {% if tasks %}
@@ -48,7 +58,7 @@
         {% endfor %}
       </ul>
     {% else %}
-      <p class="muted">Нет задач в этом фильтре.</p>
+      <p class="muted">Ничего не найдено.</p>
     {% endif %}
   </body>
 </html>

@@ -27,18 +27,21 @@ def index():
             db.session.commit()
         return redirect(url_for("index"))
     flt = request.args.get("filter", "all")
+    qtext = request.args.get("q", "").strip()
     q = Task.query
     if flt == "active":
         q = q.filter_by(done=False)
     elif flt == "done":
         q = q.filter_by(done=True)
+    if qtext:
+        q = q.filter(Task.title.ilike(f"%{qtext}%"))
     tasks = q.order_by(Task.created_at.desc()).all()
     totals = {
         "all": Task.query.count(),
         "active": Task.query.filter_by(done=False).count(),
         "done": Task.query.filter_by(done=True).count(),
     }
-    return render_template("index.html", tasks=tasks, flt=flt, totals=totals)
+    return render_template("index.html", tasks=tasks, flt=flt, totals=totals, qtext=qtext)
 
 @app.route("/toggle/<int:task_id>", methods=["POST"])
 def toggle(task_id):
