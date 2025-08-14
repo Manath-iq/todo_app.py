@@ -26,23 +26,33 @@ def index():
             db.session.add(Task(title=title))
             db.session.commit()
         return redirect(url_for("index"))
-    tasks = Task.query.order_by(Task.created_at.desc()).all()
-    return render_template("index.html", tasks=tasks)
+    flt = request.args.get("filter", "all")
+    q = Task.query
+    if flt == "active":
+        q = q.filter_by(done=False)
+    elif flt == "done":
+        q = q.filter_by(done=True)
+    tasks = q.order_by(Task.created_at.desc()).all()
+    totals = {
+        "all": Task.query.count(),
+        "active": Task.query.filter_by(done=False).count(),
+        "done": Task.query.filter_by(done=True).count(),
+    }
+    return render_template("index.html", tasks=tasks, flt=flt, totals=totals)
 
 @app.route("/toggle/<int:task_id>", methods=["POST"])
 def toggle(task_id):
     t = Task.query.get_or_404(task_id)
     t.done = not t.done
     db.session.commit()
-    return redirect(url_for("index"))
+    return redirect(request.referrer or url_for("index"))
 
 @app.route("/delete/<int:task_id>", methods=["POST"])
 def delete(task_id):
     t = Task.query.get_or_404(task_id)
     db.session.delete(t)
     db.session.commit()
-    return redirect(url_for("index"))
+    return redirect(request.referrer or url_for("index"))
 
 if __name__ == "__main__":
-    app.run(debug=True)
-    
+    app.run(debug=True)    
